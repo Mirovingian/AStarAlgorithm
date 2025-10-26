@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Diagnostics;
 
 public class Pathfinding : MonoBehaviour
 {
@@ -16,30 +17,25 @@ public class Pathfinding : MonoBehaviour
 
     private void Update()
     {
-        FindPath(StartPoint.position, TargetPoint.position);
+        if (Input.GetButtonDown("Jump"))
+            FindPath(StartPoint.position, TargetPoint.position);
     }
 
     private void FindPath(Vector3 startPos, Vector3 targetPos)
     {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+
         Node startNode = m_Grid.NodeFromWorldPoint(startPos);
         Node targetNode = m_Grid.NodeFromWorldPoint(targetPos);
         
-        List<Node> openSet = new List<Node>();
+        Heap<Node> openSet = new Heap<Node>(m_Grid.MaxSize);
         HashSet<Node> closeSet = new HashSet<Node>();
         openSet.Add(startNode);
 
         while(openSet.Count > 0)
         {
-            //find the leaest fCost of Node
-            Node currentNode = openSet[0];
-            for (int i = 1; i < openSet.Count; ++i)
-            {
-                if (openSet[i].fCost < currentNode.fCost || openSet[i].fCost == currentNode.fCost && openSet[i].hCost < currentNode.hCost)
-                {
-                    currentNode = openSet[i];
-                }
-            }
-            openSet.Remove(currentNode);
+            Node currentNode = openSet.RemoveFirst();
             closeSet.Add(currentNode);
 
             if (currentNode == targetNode)
@@ -48,7 +44,6 @@ public class Pathfinding : MonoBehaviour
                 return;
             }
                
-
 
             foreach (Node neigbour in m_Grid.GetNeigbours(currentNode))
             {

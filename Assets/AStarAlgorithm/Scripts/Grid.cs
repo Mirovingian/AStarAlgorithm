@@ -12,6 +12,8 @@ public class Grid : MonoBehaviour
     float nodeDiameter;
     int gridSizeX, gridSizeY;
 
+    public List<Node> Path;
+
     public int MaxSize
     {
         get { return gridSizeX * gridSizeY; }
@@ -31,8 +33,7 @@ public class Grid : MonoBehaviour
             for (int y = 0; y < gridSizeY; ++y)
             {
                 Vector3 worldPos = leftBottomAngel + Vector3.right * (x * nodeDiameter + NodeRadius) + Vector3.up * (y * nodeDiameter + NodeRadius);
-                bool isWalkable = !Physics.CheckSphere(worldPos, NodeRadius, UnwalkableMask);
-                m_Grid[x, y] = new Node(isWalkable, worldPos, x, y);
+                m_Grid[x, y] = new Node(true, worldPos, x, y);
             }
         }
     }
@@ -72,9 +73,9 @@ public class Grid : MonoBehaviour
         return neigbours;
     }
 
-    public List<Node> Path;
 
-    private void OnDrawGizmos()
+
+    /*private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector3(GridWorldSize.x, GridWorldSize.y, 1));
         foreach (Node node in m_Grid)
@@ -94,5 +95,5 @@ public class Grid : MonoBehaviour
             Gizmos.DrawCube(node.WorldPosition, new Vector3(nodeDiameter - 0.1f, nodeDiameter - 0.1f, nodeDiameter - 0.1f));
 
         }
-    }
+    }*/
 }

@@ -5,29 +5,20 @@ using System.Diagnostics;
 
 public class Pathfinding : MonoBehaviour
 {
-    public Transform StartPoint;
-    public Transform TargetPoint;
+    public Node startNode;
+    public Node targetNode;
 
     private Grid m_Grid;
 
     private void Awake()
     {
-        m_Grid = GetComponent<Grid>();
+        m_Grid = GetComponent<Grid>(); 
     }
 
-    private void Update()
+    public List<Node> FindPath()
     {
-        if (Input.GetButtonDown("Jump"))
-            FindPath(StartPoint.position, TargetPoint.position);
-    }
-
-    private void FindPath(Vector3 startPos, Vector3 targetPos)
-    {
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
-
-        Node startNode = m_Grid.NodeFromWorldPoint(startPos);
-        Node targetNode = m_Grid.NodeFromWorldPoint(targetPos);
+        //Node startNode = m_Grid.NodeFromWorldPoint(StartPoint);
+        //Node targetNode = m_Grid.NodeFromWorldPoint(TargetPoint);
         
         Heap<Node> openSet = new Heap<Node>(m_Grid.MaxSize);
         HashSet<Node> closeSet = new HashSet<Node>();
@@ -40,8 +31,7 @@ public class Pathfinding : MonoBehaviour
 
             if (currentNode == targetNode)
             {
-                RetracePath(startNode, targetNode);
-                return;
+                return RetracePath(startNode, targetNode);
             }
                
 
@@ -65,9 +55,11 @@ public class Pathfinding : MonoBehaviour
 
             }
         }
+
+        return null;
     }
 
-    public void RetracePath(Node startNode, Node endNode)
+    private List<Node> RetracePath(Node startNode, Node endNode)
     {
         List<Node> path = new List<Node>();
         Node currentNode = endNode;
@@ -77,10 +69,9 @@ public class Pathfinding : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.Parent;
         }
-
+        if (path.Count > 0) path.RemoveAt(0);
         path.Reverse();
-
-        m_Grid.Path = path;
+        return path;
     }
 
     public int GetDistance(Node a, Node b)

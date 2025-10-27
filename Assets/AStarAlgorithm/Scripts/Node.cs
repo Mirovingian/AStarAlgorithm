@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Node : IHeapItem<Node>
@@ -15,7 +13,7 @@ public class Node : IHeapItem<Node>
 
     public Node Parent;
 
-    private int heapIndex;
+    private int _heapIndex;
 
     public Node(bool isWalkable, Vector3 worldPosition, int gridX, int gridY)
     {
@@ -32,8 +30,8 @@ public class Node : IHeapItem<Node>
 
     public int HeapIndex 
     { 
-        get { return heapIndex; }
-        set { heapIndex = value; }
+        get { return _heapIndex; }
+        set { _heapIndex = value; }
     }
 
     public int CompareTo(Node other)

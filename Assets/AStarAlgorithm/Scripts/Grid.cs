@@ -1,23 +1,20 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Grid : MonoBehaviour
 {
-    public LayerMask UnwalkableMask;
-    public Vector2 GridWorldSize;
-    public float NodeRadius;
-    private Node[,] m_Grid;
-
-    float nodeDiameter;
-    int gridSizeX, gridSizeY;
-
-    public List<Node> Path;
-
     public int MaxSize
     {
         get { return gridSizeX * gridSizeY; }
     }
+
+    [SerializeField] private LayerMask UnwalkableMask;
+    [SerializeField] private Vector2 GridWorldSize;
+    [SerializeField] private float NodeRadius;
+    private Node[,] _grid;
+
+    private float nodeDiameter;
+    private int gridSizeX, gridSizeY;
 
     private void Start()
     {
@@ -25,7 +22,7 @@ public class Grid : MonoBehaviour
 
         gridSizeX = Mathf.RoundToInt(GridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(GridWorldSize.y / nodeDiameter);
-        m_Grid = new Node[gridSizeX, gridSizeY];
+        _grid = new Node[gridSizeX, gridSizeY];
 
         Vector3 leftBottomAngel = transform.position - Vector3.right * (GridWorldSize.x / 2) - Vector3.up * (GridWorldSize.y / 2);
         for (int x = 0; x < gridSizeX; ++x)
@@ -33,7 +30,7 @@ public class Grid : MonoBehaviour
             for (int y = 0; y < gridSizeY; ++y)
             {
                 Vector3 worldPos = leftBottomAngel + Vector3.right * (x * nodeDiameter + NodeRadius) + Vector3.up * (y * nodeDiameter + NodeRadius);
-                m_Grid[x, y] = new Node(true, worldPos, x, y);
+                _grid[x, y] = new Node(true, worldPos, x, y);
             }
         }
     }
@@ -49,7 +46,7 @@ public class Grid : MonoBehaviour
         int x = Mathf.RoundToInt(percentX * (gridSizeX - 1));
         int y = Mathf.RoundToInt(percentY * (gridSizeY - 1));
 
-        return m_Grid[x, y];
+        return _grid[x, y];
     }
 
     public List<Node> GetNeigbours(Node node)
@@ -67,33 +64,9 @@ public class Grid : MonoBehaviour
                 int checkY = node.gridY + y;
 
                 if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
-                    neigbours.Add(m_Grid[checkX, checkY]);
+                    neigbours.Add(_grid[checkX, checkY]);
             }
         }
         return neigbours;
     }
-
-
-
-    /*private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireCube(transform.position, new Vector3(GridWorldSize.x, GridWorldSize.y, 1));
-        foreach (Node node in m_Grid)
-        {
-            if (!node.IsWalkable)
-            {
-                Gizmos.color = Color.red;
-            }
-            else if (Path != null && Path.Contains(node))
-            {
-                Gizmos.color = Color.black;
-            }
-            else
-            {
-                Gizmos.color = Color.white;
-            }
-            Gizmos.DrawCube(node.WorldPosition, new Vector3(nodeDiameter - 0.1f, nodeDiameter - 0.1f, nodeDiameter - 0.1f));
-
-        }
-    }*/
 }

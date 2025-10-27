@@ -1,26 +1,18 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Diagnostics;
 
 public class Pathfinding : MonoBehaviour
 {
-    public Node startNode;
-    public Node targetNode;
-
-    private Grid m_Grid;
+    private Grid _grid;
 
     private void Awake()
     {
-        m_Grid = GetComponent<Grid>(); 
+        _grid = GetComponent<Grid>(); 
     }
 
-    public List<Node> FindPath()
+    public List<Node> FindPath(Node startNode, Node targetNode)
     {
-        //Node startNode = m_Grid.NodeFromWorldPoint(StartPoint);
-        //Node targetNode = m_Grid.NodeFromWorldPoint(TargetPoint);
-        
-        Heap<Node> openSet = new Heap<Node>(m_Grid.MaxSize);
+        Heap<Node> openSet = new Heap<Node>(_grid.MaxSize);
         HashSet<Node> closeSet = new HashSet<Node>();
         openSet.Add(startNode);
 
@@ -35,7 +27,7 @@ public class Pathfinding : MonoBehaviour
             }
                
 
-            foreach (Node neigbour in m_Grid.GetNeigbours(currentNode))
+            foreach (Node neigbour in _grid.GetNeigbours(currentNode))
             {
                 if (!neigbour.IsWalkable || closeSet.Contains(neigbour))
                     continue;
@@ -69,7 +61,6 @@ public class Pathfinding : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.Parent;
         }
-        if (path.Count > 0) path.RemoveAt(0);
         path.Reverse();
         return path;
     }

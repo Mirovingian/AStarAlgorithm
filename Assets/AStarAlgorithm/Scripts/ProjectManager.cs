@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
+using TMPro;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public enum State
 {
@@ -20,6 +17,7 @@ public class ProjectManager : MonoBehaviour
     [SerializeField] private Material _pathMaterial;
     [SerializeField] private Material _startNodeMaterial;
     [SerializeField] private Material _targetNodeMaterial;
+    [SerializeField] private TMP_Text _text;
 
     [SerializeField] private GameObject _cube;
     private Renderer _renderer;
@@ -28,6 +26,9 @@ public class ProjectManager : MonoBehaviour
     private Pathfinding _pathfinding;
     private Grid _grid;
     private Dictionary<Vector3, GameObject> _displayedNodes = new Dictionary<Vector3, GameObject>();
+
+    private Node _startNode;
+    private Node _targetNode;
 
     private void Awake()
     {
@@ -63,7 +64,7 @@ public class ProjectManager : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(1))
         {
-            DisplayPath(_pathfinding.FindPath());
+            DisplayPath(_pathfinding.FindPath(_startNode, _targetNode));
         }
     }
 
@@ -88,16 +89,16 @@ public class ProjectManager : MonoBehaviour
         if (node.IsWalkable)
         {
             HideNodeOnScene(node.WorldPosition);
-            if (_pathfinding.startNode != null) HideNodeOnScene(_pathfinding.startNode.WorldPosition);
-            _pathfinding.startNode = node;
+            if (_startNode != null) HideNodeOnScene(_startNode.WorldPosition);
+            _startNode = node;
             DisplayNodeOnScene(node.WorldPosition, _startNodeMaterial);   
         }
         else
         {
             node.IsWalkable = true;
             HideNodeOnScene(node.WorldPosition);
-            if (_pathfinding.startNode != null) HideNodeOnScene(_pathfinding.startNode.WorldPosition);
-            _pathfinding.startNode = node;
+            if (_startNode != null) HideNodeOnScene(_startNode.WorldPosition);
+            _startNode = node;
             DisplayNodeOnScene(node.WorldPosition, _startNodeMaterial);   
         }
     }
@@ -107,16 +108,16 @@ public class ProjectManager : MonoBehaviour
         if (node.IsWalkable)
         {
             HideNodeOnScene(node.WorldPosition);
-            if (_pathfinding.targetNode != null) HideNodeOnScene(_pathfinding.targetNode.WorldPosition);
-            _pathfinding.targetNode = node;
+            if (_targetNode != null) HideNodeOnScene(_targetNode.WorldPosition);
+            _targetNode = node;
             DisplayNodeOnScene(node.WorldPosition, _targetNodeMaterial);
         }
         else
         {
             node.IsWalkable = true;
             HideNodeOnScene(node.WorldPosition);
-            if (_pathfinding.targetNode != null) HideNodeOnScene(_pathfinding.targetNode.WorldPosition);
-            _pathfinding.targetNode = node;
+            if (_targetNode != null) HideNodeOnScene(_targetNode.WorldPosition);
+            _targetNode = node;
             DisplayNodeOnScene(node.WorldPosition, _targetNodeMaterial);
         }
     }
@@ -127,7 +128,9 @@ public class ProjectManager : MonoBehaviour
         HidePath(_currentPath);
 
         _currentPath = path;
-        if (_currentPath == null) return;
+        if (_currentPath == null || _currentPath.Count == 0) return;
+
+        _text.text = $"Длина пути: {_currentPath[_currentPath.Count - 1].gCost}";
 
         foreach (var node  in _currentPath)
         {
@@ -141,8 +144,10 @@ public class ProjectManager : MonoBehaviour
 
         foreach (var node in path)
         {
-            if (node.IsWalkable && node != _pathfinding.startNode && node != _pathfinding.targetNode) 
+            if (node.IsWalkable && node != _startNode && node != _targetNode)
+            {
                 HideNodeOnScene(node.WorldPosition);
+            }
         }
     }
 
